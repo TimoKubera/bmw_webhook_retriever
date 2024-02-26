@@ -48,8 +48,11 @@ def get_file_content(owner, repo, path):
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
     response = requests.get(url)
     file = response.json()
-    content = base64.b64decode(file["content"]).decode("utf-8")
-    return content
+    if response.status_code == 200 and "content" in file:
+        content = base64.b64decode(file["content"]).decode("utf-8")
+        return content
+    else:
+        return f"Could not get content of {path}. Response code: {response.status_code}, response: {file}"
 
 print("Content of the changed files:")
 for path in changed_files:
