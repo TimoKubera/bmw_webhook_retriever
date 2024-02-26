@@ -29,22 +29,21 @@ def extract_repo_info(data):
     pull_number = data["number"]
     return owner, repo, pull_number
 
+owner, repo, pull_number = extract_repo_info(json_list[0])
+print(f"Owner: {owner}, Repo: {repo}, Pull Number: {pull_number}")
+print()
+
 def get_changed_files(owner, repo, pull_number):
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}/files"
     response = requests.get(url)
     files = response.json()
     return [file["filename"] for file in files]
-
-owner, repo, pull_number = extract_repo_info(json_list[0])
 changed_files = get_changed_files(owner, repo, pull_number)
-print(f"Owner: {owner}, Repo: {repo}, Pull Number: {pull_number}")
-print()
-
 print("Changed Files:")
 print(changed_files)
 print()
 
-def get_file_content(owner, repo, path):
+""" def get_file_content(owner, repo, path):
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
     response = requests.get(url)
     file = response.json()
@@ -59,4 +58,14 @@ for path in changed_files:
     print(f"Content of {path}:")
     content = get_file_content(owner, repo, path)
     print(content)
-print()
+print() """
+
+def handle_webhook(data):
+    # Source und target branch extrahieren
+    source_branch = data["pull_request"]["head"]["ref"]
+    target_branch = data["pull_request"]["base"]["ref"]
+    return source_branch, target_branch
+
+source_branch, target_branch = handle_webhook(json_list[0])
+
+print(f"Source Branch: {source_branch}, Target Branch: {target_branch}")
